@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  ai-command-center:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ai_business_command_center
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+      - ENVIRONMENT=production
+    restart: unless-stopped

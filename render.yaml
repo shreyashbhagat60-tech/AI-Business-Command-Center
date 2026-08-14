@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: ai-business-command-center
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: Dockerfile
+    envVars:
+      - key: PORT
+        value: 8000
+      - key: ENVIRONMENT
+        value: production
