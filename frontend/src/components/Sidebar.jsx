@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
   LineChart,
@@ -10,14 +10,18 @@ import {
   BrainCircuit,
   FileSpreadsheet,
   Settings as SettingsIcon,
-  Sparkles,
-  Activity,
+  User,
+  LogOut,
   X
 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 export const Sidebar = ({ mobileOpen, setMobileOpen, systemHealth }) => {
+  const navigate = useNavigate();
+  const { logout } = useAuth();
+
   const navItems = [
-    { section: 'Overview' },
+    { section: 'Executive Suite' },
     { to: '/dashboard', label: 'Command Center', icon: LayoutDashboard, badge: 'Live' },
     { to: '/analytics', label: 'Analytics Explorer', icon: LineChart },
     
@@ -28,8 +32,9 @@ export const Sidebar = ({ mobileOpen, setMobileOpen, systemHealth }) => {
     { to: '/customer-segmentation', label: 'Segmentation', icon: Users, badge: 'ML' },
     
     { section: 'Decision Support & Ops' },
-    { to: '/ai-advisor', label: 'AI Advisor', icon: BrainCircuit, badge: 'AI' },
+    { to: '/ai-advisor', label: 'AI Business Advisor', icon: BrainCircuit, badge: 'AI' },
     { to: '/reports', label: 'Business Reports', icon: FileSpreadsheet },
+    { to: '/profile', label: 'User Profile', icon: User },
     { to: '/settings', label: 'System Settings', icon: SettingsIcon },
   ];
 
@@ -37,6 +42,12 @@ export const Sidebar = ({ mobileOpen, setMobileOpen, systemHealth }) => {
     if (mobileOpen && setMobileOpen) {
       setMobileOpen(false);
     }
+  };
+
+  const handleLogout = async () => {
+    handleNavClick();
+    await logout();
+    navigate('/login');
   };
 
   return (
@@ -82,6 +93,23 @@ export const Sidebar = ({ mobileOpen, setMobileOpen, systemHealth }) => {
             </NavLink>
           );
         })}
+
+        <button
+          onClick={handleLogout}
+          className="nav-item"
+          style={{
+            background: 'none',
+            border: 'none',
+            width: '100%',
+            textAlign: 'left',
+            cursor: 'pointer',
+            marginTop: '8px',
+            color: 'var(--accent-rose)'
+          }}
+        >
+          <LogOut size={18} />
+          <span>Sign Out</span>
+        </button>
       </nav>
 
       <div className="sidebar-footer">

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
+const BASE_URL = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' && window.location.hostname ? `http://${window.location.hostname}:8000` : 'http://127.0.0.1:8000');
 
 const apiClient = axios.create({
   baseURL: BASE_URL,
@@ -10,7 +10,19 @@ const apiClient = axios.create({
   },
 });
 
-// Interceptor for consistent error formatting
+// Request Interceptor: Attach Authorization Bearer Token
+apiClient.interceptors.request.use(
+  config => {
+    const token = localStorage.getItem('ai_bcc_token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  error => Promise.reject(error)
+);
+
+// Response Interceptor: Format error messages
 apiClient.interceptors.response.use(
   response => response,
   error => {
@@ -27,6 +39,38 @@ apiClient.interceptors.response.use(
 );
 
 export const apiService = {
+  // Authentication & Profile
+  login: async (credentials) => {
+    const res = await apiClient.post('/auth/login', credentials);
+    return res.data;
+  },
+
+  register: async (userData) => {
+    const res = await apiClient.post('/auth/register', userData);
+    return res.data;
+  },
+
+  getProfile: async () => {
+    const res = await apiClient.get('/auth/me');
+    return res.data;
+  },
+
+  updateProfile: async (profileData) => {
+    const res = await apiClient.put('/profile', profileData);
+    return res.data;
+  },
+
+  forgotPassword: async (data) => {
+    const res = await apiClient.post('/auth/forgot-password', data);
+    return res.data;
+  },
+
+  logout: async () => {
+    const res = await apiClient.post('/auth/logout');
+    return res.data;
+  },
+
+  // Business Intelligence & Predictions
   getDashboard: async () => {
     const res = await apiClient.get('/dashboard');
     return res.data;
@@ -54,6 +98,11 @@ export const apiService = {
 
   getAdvisor: async (data = {}) => {
     const res = await apiClient.post('/advisor', data);
+    return res.data;
+  },
+
+  chatAdvisor: async (query) => {
+    const res = await apiClient.post('/advisor/chat', { query });
     return res.data;
   },
 

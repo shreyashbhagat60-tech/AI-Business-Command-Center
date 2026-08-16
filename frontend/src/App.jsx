@@ -1,9 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
+import { AuthProvider } from './context/AuthContext';
+
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
+import ProtectedRoute from './components/ProtectedRoute';
 
+import Login from './pages/Login';
+import Register from './pages/Register';
+import ForgotPassword from './pages/ForgotPassword';
 import Dashboard from './pages/Dashboard';
 import Analytics from './pages/Analytics';
 import SalesPrediction from './pages/SalesPrediction';
@@ -12,13 +18,50 @@ import CustomerChurn from './pages/CustomerChurn';
 import CustomerSegmentation from './pages/CustomerSegmentation';
 import AIAdvisor from './pages/AIAdvisor';
 import Reports from './pages/Reports';
+import Profile from './pages/Profile';
 import Settings from './pages/Settings';
 
 import apiService from './services/api';
 import './App.css';
 
-export const App = () => {
+// Shell layout for protected pages
+const AppLayout = ({ systemHealth }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  return (
+    <div className="app-container">
+      <Sidebar
+        mobileOpen={mobileOpen}
+        setMobileOpen={setMobileOpen}
+        systemHealth={systemHealth}
+      />
+
+      <div className="main-wrapper">
+        <Navbar
+          setMobileOpen={setMobileOpen}
+          systemHealth={systemHealth}
+        />
+
+        <Routes>
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/analytics" element={<Analytics />} />
+          <Route path="/sales-prediction" element={<SalesPrediction />} />
+          <Route path="/profit-prediction" element={<ProfitPrediction />} />
+          <Route path="/customer-churn" element={<CustomerChurn />} />
+          <Route path="/customer-segmentation" element={<CustomerSegmentation />} />
+          <Route path="/ai-advisor" element={<AIAdvisor />} />
+          <Route path="/reports" element={<Reports />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        </Routes>
+      </div>
+    </div>
+  );
+};
+
+export const App = () => {
   const [systemHealth, setSystemHealth] = useState(null);
 
   useEffect(() => {
@@ -35,36 +78,26 @@ export const App = () => {
 
   return (
     <ThemeProvider>
-      <Router>
-        <div className="app-container">
-          <Sidebar
-            mobileOpen={mobileOpen}
-            setMobileOpen={setMobileOpen}
-            systemHealth={systemHealth}
-          />
+      <AuthProvider>
+        <Router>
+          <Routes>
+            {/* Public Authentication Routes */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
 
-          <div className="main-wrapper">
-            <Navbar
-              setMobileOpen={setMobileOpen}
-              systemHealth={systemHealth}
+            {/* Protected Application Routes */}
+            <Route
+              path="/*"
+              element={
+                <ProtectedRoute>
+                  <AppLayout systemHealth={systemHealth} />
+                </ProtectedRoute>
+              }
             />
-
-            <Routes>
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/analytics" element={<Analytics />} />
-              <Route path="/sales-prediction" element={<SalesPrediction />} />
-              <Route path="/profit-prediction" element={<ProfitPrediction />} />
-              <Route path="/customer-churn" element={<CustomerChurn />} />
-              <Route path="/customer-segmentation" element={<CustomerSegmentation />} />
-              <Route path="/ai-advisor" element={<AIAdvisor />} />
-              <Route path="/reports" element={<Reports />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="*" element={<Navigate to="/dashboard" replace />} />
-            </Routes>
-          </div>
-        </div>
-      </Router>
+          </Routes>
+        </Router>
+      </AuthProvider>
     </ThemeProvider>
   );
 };

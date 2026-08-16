@@ -24,3 +24,11 @@ env/
 .idea/
 *.swp
 *.DS_Store
+
+# Backend local data
+*.db
+backend/data/users.json
+
+# Backend local data
+*.db
+backend/data/users.json
