@@ -1,7 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' && window.location.hostname ? `http://${window.location.hostname}:8000` : 'http://127.0.0.1:8000');
-
+const BASE_URL = import.meta.env.VITE_API_URL || 'https://ai-business-command-center-api.onrender.com';
 const apiClient = axios.create({
   baseURL: BASE_URL,
   timeout: 15000,
